@@ -1,6 +1,6 @@
 <div x-data="{ open: false }" class="select-none">
     <div 
-        @click="open = !open" 
+        @click="{{ $item['type'] === 'directory' ? 'open = !open' : "openInEditor('".str_replace('\\', '/', $item['path'])."')" }}" 
         class="group flex items-center px-2 py-1.5 rounded-md hover:bg-slate-800/50 cursor-pointer transition-colors"
         :class="{ 'text-brand-400 bg-brand-600/5': open && '{{ $item['type'] }}' === 'directory' }"
     >

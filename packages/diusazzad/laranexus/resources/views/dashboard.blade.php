@@ -39,9 +39,11 @@
         .mindmap-bg { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0); background-size: 40px 40px; }
         .mermaid { background: transparent !important; }
         [x-cloak] { display: none !important; }
+        .node-highlight { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.8)); transition: all 0.3s; }
+        .node-dimmed { opacity: 0.2; filter: grayscale(100%); transition: all 0.3s; }
     </style>
 </head>
-<body class="h-full font-sans antialiased mindmap-bg" x-data="{ sidebarOpen: true, search: '' }">
+<body class="h-full font-sans antialiased mindmap-bg" x-data="laranexus()">
 
     <div class="flex h-screen overflow-hidden">
         
@@ -59,7 +61,7 @@
             <div class="flex-1 overflow-y-auto p-4 space-y-6">
                 <!-- Search -->
                 <div class="relative">
-                    <input type="text" x-model="search" placeholder="Search files..." class="w-full bg-slate-900/50 border border-slate-800 rounded-lg py-2 pl-10 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all">
+                    <input type="text" x-model="search" @input.debounce.300ms="filterNodes()" placeholder="Search routes, controllers..." class="w-full bg-slate-900/50 border border-slate-800 rounded-lg py-2 pl-10 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all">
                     <svg class="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
 
@@ -77,7 +79,7 @@
             <div class="p-4 border-t border-slate-800 bg-slate-950/50">
                 <div class="flex items-center gap-2 px-2">
                     <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Engine v1.0 Live</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter text-xs">Engine v1.0 Live</span>
                 </div>
             </div>
         </aside>
@@ -93,11 +95,15 @@
                     <div class="flex items-center gap-2 text-xs text-slate-500">
                         <span>Workspace</span>
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                        <span class="text-slate-200 font-medium">Application Mindmap</span>
+                        <span class="text-slate-200 font-medium">Interactive Mindmap</span>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-3">
+                    <button class="bg-slate-800 border border-slate-700 text-slate-300 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-700 transition-all flex items-center gap-2" @click="exportToSVG()">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Export SVG
+                    </button>
                     <button class="bg-brand-600/10 border border-brand-500/20 text-brand-400 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-600/20 transition-all" onclick="window.location.reload()">
                         Refresh Map
                     </button>
@@ -105,7 +111,7 @@
             </header>
 
             <div class="flex-1 overflow-auto flex items-center justify-center p-8">
-                <div class="mermaid relative">
+                <div id="mermaid-container" class="mermaid relative">
                     {!! $mermaidString !!}
                 </div>
             </div>
@@ -121,17 +127,60 @@
     </div>
 
     <script>
-        // Deep Linking: Handle clicks on Mermaid nodes
-        document.addEventListener('click', function(e) {
-            const node = e.target.closest('.node');
-            if (node) {
-                const label = node.querySelector('.nodeLabel')?.innerText;
-                if (label) {
-                    console.log('Node clicked:', label);
-                    // Add logic to search in project tree and open via vscode://
+        function laranexus() {
+            return {
+                sidebarOpen: true,
+                search: '',
+                
+                filterNodes() {
+                    const nodes = document.querySelectorAll('.node');
+                    if (!this.search) {
+                        nodes.forEach(n => n.classList.remove('node-dimmed', 'node-highlight'));
+                        return;
+                    }
+
+                    const searchTerm = this.search.toLowerCase();
+                    nodes.forEach(node => {
+                        const label = node.querySelector('.nodeLabel')?.textContent.toLowerCase() || '';
+                        if (label.includes(searchTerm)) {
+                            node.classList.remove('node-dimmed');
+                            node.classList.add('node-highlight');
+                        } else {
+                            node.classList.remove('node-highlight');
+                            node.classList.add('node-dimmed');
+                        }
+                    });
+                },
+
+                exportToSVG() {
+                    const svg = document.querySelector('#mermaid-container svg');
+                    if (!svg) return;
+
+                    const serializer = new XMLSerializer();
+                    let source = serializer.serializeToString(svg);
+                    
+                    if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    if(!source.match(/^<svg[^>]+xmlns\:xlink="http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+                    }
+
+                    const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "laranexus-mindmap.svg";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                openInEditor(path) {
+                    if (!path) return;
+                    window.location.href = `vscode://file/${path}`;
                 }
             }
-        });
+        }
     </script>
 </body>
 </html>
