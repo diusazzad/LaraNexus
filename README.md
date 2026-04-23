@@ -50,6 +50,11 @@ Once installed, simply visit your application's dashboard at:
 > [!NOTE]
 > By default, the dashboard is only accessible in the `local` environment for security reasons.
 
+## 📚 Learning Roadmap
+
+Want to learn how this package was built from scratch? Check out our step-by-step documentation:
+👉 **[The Learning Journey](learn/01_Initial_Strategy.md)**
+
 ## ⚙️ Configuration
 
 The published configuration file `config/laranexus.php` allows you to customize:
