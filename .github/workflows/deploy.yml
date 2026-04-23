@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel 
 
 on:
   push:
@@ -13,32 +13,14 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      - name: 🔨 Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-
-      - name: 📦 Install Composer Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-      - name: 🔨 Install NPM dependencies and build
-        run: |
-            npm install
-            npm run build
-
-      - name: 📂 Sync files via FTP
+      - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: public_html/
+          server-dir: laranexus.zengfy.top/
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
-            **/tests/**
-            **/storage/*.php
-            **/storage/framework/cache/**
-            **/storage/framework/sessions/**
-            **/storage/framework/views/**
