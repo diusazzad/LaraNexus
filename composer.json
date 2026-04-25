@@ -1,15 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
-    "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "name": "diusazzad/laranexus",
+    "type": "library",
+    "description": "Interactive Application Mindmap for Laravel developers.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.0",
-        "laravel/tinker": "^3.0",
-        "diusazzad/laranexus": "@dev"
+        "laravel/tinker": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -22,6 +21,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "Diusazzad\\LaraNexus\\": "packages/diusazzad/laranexus/src/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
@@ -69,6 +69,9 @@
     },
     "extra": {
         "laravel": {
+            "providers": [
+                "Diusazzad\\LaraNexus\\LaraNexusServiceProvider"
+            ],
             "dont-discover": []
         }
     },
