@@ -23,7 +23,13 @@
 
 - 🗺️ **Interactive Mindmap:** View your entire application flow from Route to Method in a node-based graph.
 - 🎨 **Premium UI:** Modern Dark-mode dashboard with Glassmorphism effects.
-- 🔍 **Live Discovery:** Automatically scans your `web.php`, `api.php`, and custom route files.
+- 📊 **Visual Hierarchy:** Group routes by Controllers using Mermaid.js subgraphs.
+- 🛡️ **Security Mapping:** Automated Middleware detection and visualization on the map.
+- 🔍 **Deep Discovery:** Static analysis scanning of Controllers for Eloquent Models and Blade Views.
+- 🛠 **IDE Connectivity:** Open any file directly in VS Code with a single click.
+- 📑 **Project Tree:** Full hierarchical view of your application's source code.
+- ⚡ **Live Search:** Real-time filtering of routes and controllers.
+- 📤 **SVG Export:** Save your architecture map for documentation or presentations.
 - 🛠️ **Zero Configuration:** Install and go. It works out of the box for standard and modular projects.
 - 🔗 **Deep Connectivity:** (Coming Soon) Visualize Eloquent relationships and Service injections.
 

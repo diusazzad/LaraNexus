@@ -41,6 +41,8 @@
         [x-cloak] { display: none !important; }
         .node-highlight { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.8)); transition: all 0.3s; }
         .node-dimmed { opacity: 0.2; filter: grayscale(100%); transition: all 0.3s; }
+        .subgraph-label { fill: #94a3b8 !important; font-weight: 700 !important; font-size: 14px !important; }
+        .cluster rect { fill: rgba(30, 41, 59, 0.4) !important; stroke: rgba(148, 163, 184, 0.2) !important; stroke-width: 2px !important; rx: 15; ry: 15; }
     </style>
 </head>
 <body class="h-full font-sans antialiased mindmap-bg" x-data="laranexus()">
@@ -141,7 +143,7 @@
 
                     const searchTerm = this.search.toLowerCase();
                     nodes.forEach(node => {
-                        const label = node.querySelector('.nodeLabel')?.textContent.toLowerCase() || '';
+                        const label = node.querySelector('.nodeLabel')?.innerHTML.toLowerCase() || '';
                         if (label.includes(searchTerm)) {
                             node.classList.remove('node-dimmed');
                             node.classList.add('node-highlight');
