@@ -65,9 +65,31 @@ Want to learn how this package was built from scratch? Check out our step-by-ste
 
 The published configuration file `config/laranexus.php` allows you to customize:
 
-- **Path:** Change the default `/laranexus` URI.
-- **Middleware:** Add custom authentication or authorization middlewares.
-- **Ignored Routes:** Exclude specific patterns (e.g., debug or internal routes).
+| Key | Environment variable | Type | Purpose |
+| --- | --- | --- | --- |
+| `path` | `LARANEXUS_PATH` | string | The dashboard URI path, default `laranexus`. |
+| `middleware` | *(none)* | array | Route middleware applied to LaraNexus screens (default: `['web']`). |
+
+### Example
+
+```env
+LARANEXUS_PATH=admin/architecture
+```
+
+```php
+return [
+    'path' => env('LARANEXUS_PATH', 'laranexus'),
+    'middleware' => [
+        'web',
+        'auth',
+    ],
+];
+```
+
+## 🧱 Supported Versions
+
+- **PHP**: `8.3` and above.
+- **Laravel**: `12` and `13`.
 
 ## 🛡️ Security
 
