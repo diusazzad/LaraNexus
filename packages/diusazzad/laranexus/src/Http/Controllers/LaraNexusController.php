@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Diusazzad\LaraNexus\Http\Controllers;
 
 use Diusazzad\LaraNexus\Support\ProjectTreeGenerator;

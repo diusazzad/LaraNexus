@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Diusazzad\LaraNexus\Support;
 
 use Illuminate\Support\Facades\File;
@@ -9,7 +11,7 @@ class ProjectTreeGenerator
     /**
      * Generate a nested array representation of the project structure.
      */
-    public function generateTree(string $path = null): array
+    public function generateTree(?string $path = null): array
     {
         $path = $path ?: base_path('app');
         $tree = [];

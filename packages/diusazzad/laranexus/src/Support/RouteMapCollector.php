@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Diusazzad\LaraNexus\Support;
 
 use Illuminate\Support\Facades\Route;
