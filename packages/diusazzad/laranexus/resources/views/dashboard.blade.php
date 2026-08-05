@@ -45,7 +45,7 @@
         .cluster rect { fill: rgba(30, 41, 59, 0.4) !important; stroke: rgba(148, 163, 184, 0.2) !important; stroke-width: 2px !important; rx: 15; ry: 15; }
     </style>
 </head>
-<body class="h-full font-sans antialiased mindmap-bg" x-data="laranexus()">
+<body class="h-full font-sans antialiased mindmap-bg" x-data="laranexus()" x-init="initA11yAndCopy()">
 
     <div class="flex h-screen overflow-hidden">
         
@@ -125,6 +125,10 @@
                     <button class="p-2 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg></button>
                 </div>
             </div>
+            <!-- Toast Notification -->
+            <div id="copy-toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-2 rounded shadow-lg transform transition-all duration-300 translate-y-20 opacity-0 z-50">
+                Copied to clipboard!
+            </div>
         </main>
     </div>
 
@@ -180,6 +184,41 @@
                 openInEditor(path) {
                     if (!path) return;
                     window.location.href = `vscode://file/${path}`;
+                },
+
+                initA11yAndCopy() {
+                    setTimeout(() => {
+                        const nodes = document.querySelectorAll('.node');
+                        nodes.forEach(node => {
+                            // Accessibility
+                            const label = node.querySelector('.nodeLabel')?.textContent || 'Mindmap Node';
+                            const cleanText = label.replace(/🔐.*$/, '').trim();
+                            node.setAttribute('aria-label', cleanText);
+                            node.setAttribute('tabindex', '0');
+
+                            // Keyboard support
+                            node.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    node.click();
+                                }
+                            });
+
+                            // Copy to clipboard on click
+                            node.addEventListener('click', (e) => {
+                                // If they clicked the specific vscode link, don't just copy
+                                if (e.target.closest('a')) return;
+                                
+                                navigator.clipboard.writeText(cleanText).then(() => {
+                                    const toast = document.getElementById('copy-toast');
+                                    if (toast) {
+                                        toast.classList.remove('translate-y-20', 'opacity-0');
+                                        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2000);
+                                    }
+                                });
+                            });
+                        });
+                    }, 1500); // Give Mermaid some time to fully render SVG
                 }
             }
         }
