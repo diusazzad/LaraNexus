@@ -69,20 +69,24 @@ class RouteMapCollector
 
         foreach ($controllers as $name => $data) {
             $ctrlId = "C_" . md5($name);
-            $mermaidLines[] = "    subgraph {$ctrlId} [\"$name\"]";
+            $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+            $mermaidLines[] = "    subgraph {$ctrlId} [\"$safeName\"]";
             
             foreach ($data['routes'] as $r) {
                 $routeId = "R_" . md5($r['uri']);
                 $methodId = "M_" . md5($r['uri'] . $r['action']);
                 
                 // Route Node with Middleware
-                $label = "/{$r['uri']}";
+                $safeUri = htmlspecialchars($r['uri'], ENT_QUOTES, 'UTF-8');
+                $label = "/{$safeUri}";
                 if ($r['middleware']) {
-                    $label .= " <br/><small>🔐 {$r['middleware']}</small>";
+                    $safeMiddleware = htmlspecialchars($r['middleware'], ENT_QUOTES, 'UTF-8');
+                    $label .= " <br/><small>🔐 {$safeMiddleware}</small>";
                 }
 
+                $safeAction = htmlspecialchars($r['action'], ENT_QUOTES, 'UTF-8');
                 $mermaidLines[] = "        {$routeId}([\"$label\"]):::route";
-                $mermaidLines[] = "        {$methodId}(\"{$r['action']}\"):::method";
+                $mermaidLines[] = "        {$methodId}(\"{$safeAction}\"):::method";
                 $mermaidLines[] = "        {$routeId} --> {$methodId}";
 
                 // Discovery Logic (Same as before but nested)
@@ -96,13 +100,15 @@ class RouteMapCollector
                         preg_match_all('/use App\\\Models\\\([a-zA-Z]+);/', $content, $modelMatches);
                         foreach (array_unique($modelMatches[1]) as $modelName) {
                             $modelId = "Mod_" . md5($modelName);
-                            $mermaidLines[] = "        {$methodId} -- uses --> {$modelId}[(\"DB: $modelName\")]:::model";
+                            $safeModel = htmlspecialchars($modelName, ENT_QUOTES, 'UTF-8');
+                            $mermaidLines[] = "        {$methodId} -- uses --> {$modelId}[(\"DB: $safeModel\")]:::model";
                         }
 
                         preg_match_all('/view\([\'"]([a-zA-Z0-9._-]+)[\'"]\)/', $content, $viewMatches);
                         foreach (array_unique($viewMatches[1]) as $viewName) {
                             $viewId = "V_" . md5($viewName);
-                            $mermaidLines[] = "        {$methodId} -- renders --> {$viewId}[[\"View: $viewName\"]]:::view";
+                            $safeView = htmlspecialchars($viewName, ENT_QUOTES, 'UTF-8');
+                            $mermaidLines[] = "        {$methodId} -- renders --> {$viewId}[[\"View: $safeView\"]]:::view";
                         }
                     }
                 }
