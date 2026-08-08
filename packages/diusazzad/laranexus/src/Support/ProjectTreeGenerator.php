@@ -15,7 +15,7 @@ class ProjectTreeGenerator
         $tree = [];
 
         if (!File::isDirectory($path)) {
-            return $tree;
+            throw new \Diusazzad\LaraNexus\Exceptions\MindmapGenerationException("Directory does not exist: {$path}");
         }
 
         $items = File::directories($path);

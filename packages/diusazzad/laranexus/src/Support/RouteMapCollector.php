@@ -24,7 +24,11 @@ class RouteMapCollector
      */
     public function generateMermaidString(): string
     {
-        $routes = Route::getRoutes();
+        try {
+            $routes = Route::getRoutes();
+        } catch (\Exception $e) {
+            throw new \Diusazzad\LaraNexus\Exceptions\MindmapGenerationException("Failed to retrieve application routes.", 0, $e);
+        }
         $mermaidLines = ["graph LR"];
         
         // Styling Classes
@@ -95,7 +99,10 @@ class RouteMapCollector
                     $path = $reflection->getFileName();
                     if ($path) {
                         $mermaidLines[] = "        click {$ctrlId} \"vscode://file/{$path}\" \"Open $name in VS Code\"";
-                        $content = file_get_contents($path);
+                        $content = @file_get_contents($path);
+                        if ($content === false) {
+                            throw new \Diusazzad\LaraNexus\Exceptions\MindmapGenerationException("Could not read controller file: {$path}");
+                        }
                         
                         preg_match_all('/use App\\\Models\\\([a-zA-Z]+);/', $content, $modelMatches);
                         foreach (array_unique($modelMatches[1]) as $modelName) {
